@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>The Scala.js Tutorial</title>
+  </head>
+  <body>
+    <!-- Include Scala.js compiled code -->
+    <script type="text/javascript" src="./target/scala-2.11/ankokujs-brigen-fastopt.js"></script>
+    <!-- Run tutorial.webapp.TutorialApp -->
+    <script type="text/javascript">
+      var param = {
+        "query"   : "初音ミク",
+        "service" : ["video"],
+        "search"  : ["title"],
+        "join"    : ["cmsid","title","view_counter"],
+        "filters" : [{"type":"equal","field":"music_download","value":true}],
+        "from"    : 0,
+        "size"    : 3,
+        "sort_by" : "view_counter",
+        "issuer"  : "apiguide",
+        "reason"  : "ma10"
+      };
+/*
+      NiconicoMA10().contents(param,
+        function(datas) {
+          datas.forEach(function(data) { console.log(data) })
+        },
+        function(e) { console.log(e) }
+      );
+*/
+    </script>
+    <script type="text/javascript">
+      var param = {
+        "query"   : "初音ミク",
+        "service" : ["tag_video"],
+        "from"    : 0,
+        "size"    : 5,
+        "issuer"  : "apiguide",
+        "reason"  : "ma10"
+      };
+      NiconicoMA10().tags(param,
+        function(datas) {
+          console.log('success')
+          datas.forEach(function(data) { console.log(data) })
+        },
+        function(e) {
+          console.log('fail')
+          console.log(e)
+        }
+      );
+    </script>
+  </body>
+</html>
+
