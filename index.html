@@ -97,7 +97,7 @@ var ContentsModel = function(layout) {
       function(datas) {
         if (init) { self.contents.removeAll(); }
         datas[2].values.forEach(function(value) {
-          console.log(value);
+          //console.log(value);
           self.contents.push(new Content(value));
         });
         if (typeof(layout) == 'function') { layout(); }
@@ -108,17 +108,43 @@ var ContentsModel = function(layout) {
   self.contents = ko.observableArray();
 
   self.word = ko.observable();
+  self.sortBy = ko.observable();
 
   self.search = function() {
-    query(param(function(param) { param.query = self.word(); }), true);
+    query(param(function(param) {
+        param.query = self.word();
+        param.sort_by = self.sortBy();
+      }), true);
   };
 
-  self.next = function() {
+  function __sortBy(key) {
+    self.sortBy(key);
+    self.search();
+  }
+
+  self.sortByViewCounter = function() {
+    __sortBy('view_counter');
+  };
+
+  self.sortByCommentCounter = function() {
+    __sortBy('comment_counter');
+  };
+
+  self.sortByMylistCounter = function() {
+    __sortBy('mylist_counter');
+  };
+
+  self.sortByStartTime = function() {
+    __sortBy('start_time');
+  };
+
+  self.more = function() {
     query(param(function(param) { param.from += param.size; }));
   };
 
   (function() {
     self.word('初音ミク');
+    self.sortBy('view_counter');
     self.search();
   }());
 };
@@ -143,12 +169,26 @@ $(function() {
 
       <div class="row" style="margin-bottom:20px;">
         <div class="col-sm-offset-3 col-md-offset-4 col-lg-offset-4 col-xs-12 col-sm-6 col-md-4 col-lg-4">
-          <form data-bind="submit: search" class="input-group">
+          <form data-bind="submit: search" class="input-group" style="margin-bottom:10px;">
             <input data-bind="value: word" type="text" class="form-control" />
             <span class="input-group-btn">
               <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
             </span>
           </form>
+          <div class="btn-group btn-group-justified">
+            <div class="btn-group">
+              <button data-bind="click: sortByViewCounter, css: { active: sortBy() == 'view_counter' }" type="button" class="btn btn-default">再生数</button>
+            </div>
+            <div class="btn-group">
+              <button data-bind="click: sortByCommentCounter, css: { active: sortBy() == 'comment_counter' }" type="button" class="btn btn-default">コメント数</button>
+            </div>
+            <div class="btn-group">
+              <button data-bind="click: sortByMylistCounter, css: { active: sortBy() == 'mylist_counter' }" type="button" class="btn btn-default">マイリス数</button>
+            </div>
+            <div class="btn-group">
+              <button data-bind="click: sortByStartTime, css: { active: sortBy() == 'start_time' }" type="button" class="btn btn-default">投稿日時</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -187,7 +227,7 @@ $(function() {
 
       <div class="row">
         <div class="col-sm-offset-3 col-md-offset-4 col-lg-offset-4 col-xs-12 col-sm-6 col-md-4 col-lg-4">
-          <button data-bind="click: next" class="btn btn-lg btn-primary" style="width:100%;">Motto!! щ(ﾟдﾟщ) </button>
+          <button data-bind="click: more" class="btn btn-lg btn-primary" style="width:100%;">Motto!! щ(ﾟдﾟщ) </button>
         </div>
       </div>
 
