@@ -1,5 +1,5 @@
 //# encoding: utf-8
-// src/main/scala/NiconicoMa10.scala
+// src/main/scala/niconico_ma_10.scala
 
 package ankokujs.brigen
 
@@ -14,10 +14,10 @@ import js.annotation.JSExport
 object NiconicoMA10 {
 
   type Dictionary   = js.Dictionary[AnyRef]
-  type JSArray      = js.Array[Dictionary]
+  type DictArray    = js.Array[Dictionary]
   type ContentParam = Dictionary
   type TagParam     = Dictionary
-  type OnSuccess    = Callback[JSArray]
+  type OnSuccess    = Callback[DictArray]
   type OnInvalid    = Callback[Dictionary]
   type OnFailure    = Callback[Throwable]
 
@@ -48,7 +48,7 @@ object NiconicoMA10 {
           case None => success(ary)
           case Some(dic) => Option(invalid).map(_(dic))
         }
-      }: Unit, failure)
+      }, failure)
   }
 }
 

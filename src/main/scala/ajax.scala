@@ -2,7 +2,7 @@
 //   http://blog.pab-tech.net/2014/03/07/scala-js-future.html
 
 //# encoding: utf-8
-// src/main/scala/Ajax.scala
+// src/main/scala/ajax.scala
 
 package ankokujs.brigen
 
