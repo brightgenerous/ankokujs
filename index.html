@@ -115,7 +115,7 @@ var ContentsModel = function(layout) {
   self.sortBy = ko.observable();
 
   self.search = function() {
-    query(param(function(param) {
+    query(reset(function(param) {
         param.query = self.word();
         param.sort_by = self.sortBy();
       }), true);
