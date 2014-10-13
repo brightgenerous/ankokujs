@@ -1,0 +1,12 @@
+[0m[[0minfo[0m] [0mFast optimizing /Users/katou/git/ankokujs/target/scala-2.11/ankokujs-brigen-fastopt.js[0m
+[0m[[0mdebug[0m] [0mRead info: 92840 us[0m
+[0m[[0mdebug[0m] [0mCompute reachability: 120955 us[0m
+[0m[[0mdebug[0m] [0mOptimizer batch mode: true[0m
+[0m[[0mdebug[0m] [0mIncremental part of inc. optimizer: 259334 us[0m
+[0m[[0mdebug[0m] [0mOptimizing 2561 methods.[0m
+[0m[[0mdebug[0m] [0mOptimizer part of inc. optimizer: 327448 us[0m
+[0m[[0mdebug[0m] [0mInliner: 589096 us[0m
+[0m[[0mdebug[0m] [0mRefined reachability analysis: 65519 us[0m
+[0m[[0mdebug[0m] [0mOptimizations part: 777037 us[0m
+[0m[[0mdebug[0m] [0mWrite DCE'ed output: 381087 us[0m
+[0m[[0mdebug[0m] [0mInc. opt stats: reused: 0 -- invalidated: 3294 -- trees read: 324[0m
