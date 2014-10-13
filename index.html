@@ -25,6 +25,22 @@
     <script type="text/javascript" src="./target/scala-2.11/ankokujs-brigen-fastopt.js"></script>
 
     <script type="text/javascript">//<![CDATA[
+(function() {
+
+function wwwUrl(id) { return 'http://www.nicovideo.jp/'+id; }
+
+function comUrl(id) { return 'http://com.nicovideo.jp/'+id; }
+
+function watchUrl(id) { return wwwUrl('watch/'+id); }
+
+function communityUrl(id) { return comUrl('community/'+id); }
+
+function innerUrl(str) {
+  return str.replace(/((?:mylist|user|watch)[\/\d]+)/g,'<a href="' + wwwUrl('$1') + '" target="_blank">$1</a>')
+    .replace(/(sm[\d]+)/g,'<a href="' + watchUrl('$1') + '" target="_blank">$1</a>')
+    .replace(/(co[\d]+)/g,'<a href="' + communityUrl('$1') + '" target="_blank">$1</a>');
+}
+
 function Content(dic) {
   var self = this;
   for (k in dic) { self[k] = dic[k]; }
@@ -47,24 +63,15 @@ function Content(dic) {
     var tags = self['__'+key] = self[key];
     self[key] = tags.split(' ');
   });
-  function wwwUrl(id) { return 'http://www.nicovideo.jp/'+id; }
-  function comUrl(id) { return 'http://com.nicovideo.jp/'+id; }
-  function watchUrl(id) { return wwwUrl('watch/'+id); }
-  function communityUrl(id) { return comUrl('community/'+id); }
   ['cmsid'].forEach(function(key) {
     var id = self['__'+key] = self[key];
     self[key] = watchUrl(id);
   });
-  function innerUrl(str) {
-    return str.replace(/((?:mylist|user|watch)[\/\d]+)/g,'<a href="' + wwwUrl('$1') + '" target="_blank">$1</a>')
-      .replace(/(sm[\d]+)/g,'<a href="' + watchUrl('$1') + '" target="_blank">$1</a>')
-      .replace(/(co[\d]+)/g,'<a href="' + communityUrl('$1') + '" target="_blank">$1</a>');
-  }
   ['description'].forEach(function(key) {
     var desc = self['__'+key] = self[key];
-    self[key] = desc.split(/(<a(?:>|\s+[^>]*>).*?<\/a>)/).map(function(str,idx) {
+    self[key] = desc.split(/(<a(?:>|\s+[^>]*>).*?<\/a>)/).map(function(str, idx) {
       if (idx % 2 == 1) { return str; }
-      return str.split(/(h?ttps?:\/\/[\w\-_\.:@!~*'\(¥);/?&=\+$,%#]+)/).map(function(str,idx) {
+      return str.split(/(h?ttps?:\/\/[\w\-_\.:@!~*'\(¥);/?&=\+$,%#]+)/).map(function(str, idx) {
         if (idx % 2 == 0) { return innerUrl(str); }
         var url = str.indexOf('h') == 0 ? str : 'h' + str;
         return '<a href="' + url + '" target="_blank">' + str + '</a>';
@@ -78,41 +85,41 @@ var ContentsModel = function(layout) {
 
   function createParam() {
     return {
-        'query'   : '',             // editable
-        'service' : ['video'],
-        'search'  : ['title', 'description', 'tags'],
-        'join'    : [
-           'cmsid',
-           'title',
-           'description',
-           'thumbnail_url',
-           'start_time',
-           'view_counter',
-           'comment_counter',
-           'mylist_counter',
-           //'channel_id',
-           //'main_community_id',
-           'length_seconds',
-           'tags'
-          ],
-        //'filters' : [{'type':'equal','field':'music_download','value':true}],
-        'from'    : 0,              // editable
-        'size'    : 20,             // editable
-        'sort_by' : '',             // editable
-        'issuer'  : 'apiguide',
-        'reason'  : 'ma10'
-      };
+      'query'   : '',             // editable
+      'service' : ['video'],
+      'search'  : ['title','description','tags'],
+      'join'    : [
+        'cmsid',
+        'title',
+        'description',
+        'thumbnail_url',
+        'start_time',
+        'view_counter',
+        'comment_counter',
+        'mylist_counter',
+        //'channel_id',
+        //'main_community_id',
+        'length_seconds',
+        'tags'
+      ],
+      //'filters' : [{'type':'equal','field':'music_download','value':true}],
+      'from'    : 0,              // editable
+      'size'    : 20,             // editable
+      'sort_by' : '',             // editable
+      'issuer'  : 'apiguide',
+      'reason'  : 'ma10'
+    };
   };
 
   var __param;
   function reset(func) {
     __param = createParam();
-    if (!!func) { func(__param); }
+    if (typeof(func) == 'function') { func(__param); }
     return __param;
   };
   function param(func) {
     if (!__param) { return reset(func); }
-    if (!!func) { func(__param); }
+    if (typeof(func) == 'function') { func(__param); }
     return __param;
   };
 
@@ -120,8 +127,12 @@ var ContentsModel = function(layout) {
     NiconicoMA10().contents(param,
       function(datas) {
         if (init) { self.contents.removeAll(); }
-        datas[2].values.forEach(function(value) {
-          self.contents.push(new Content(value));
+        datas.filter(function(data) {
+          return data.type == 'hits' && !data.endofstream;
+        }).forEach(function(data) {
+          data.values.forEach(function(value) {
+            self.contents.push(new Content(value));
+          });
         });
         if (typeof(layout) == 'function') { layout(); }
       }
@@ -135,9 +146,9 @@ var ContentsModel = function(layout) {
 
   self.search = function() {
     query(reset(function(param) {
-        param.query = self.word();
-        param.sort_by = self.sortBy();
-      }), true);
+      param.query = self.word();
+      param.sort_by = self.sortBy();
+    }), true);
   };
 
   function __sortBy(key) {
@@ -199,12 +210,14 @@ var ContentsModel = function(layout) {
 };
 
 $(function() {
-  function thumbLayout() {
-    new Masonry(document.querySelector('#thumbnail-container'),
-      { itemSelector: '.thumbnail-content' }).layout();
-  }
-  ko.applyBindings(new ContentsModel(thumbLayout));
+  var msnry = new Masonry(document.querySelector('#thumbnail-container'), { itemSelector: '.thumbnail-content' });
+  ko.applyBindings(new ContentsModel(function() {
+    msnry.reloadItems();
+    msnry.layout();
+  }));
 });
+
+}());
 //]]></script>
 
   </head>
@@ -277,8 +290,16 @@ $(function() {
       </div>
 
       <div class="row">
-        <div class="col-sm-offset-3 col-md-offset-4 col-lg-offset-4 col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <div class="col-xs-offset-2 col-sm-offset-3 col-md-offset-4 col-lg-offset-4 col-xs-8 col-sm-6 col-md-4 col-lg-4">
           <button data-bind="click: more, css: { 'btn-primary': isSortByViewCounter(), 'btn-warning': isSortByCommentCounter(), 'btn-success': isSortByMylistCounter(), 'btn-danger': isSortByStartTime() }" class="btn btn-lg" style="width:100%;">Motto!! щ(ﾟдﾟщ) </button>
+        </div>
+        <div class="col-xs-2 col-sm-3 col-md-4 col-lg-4 text-right">
+          <button id="scroll-up" class="btn btn-link"
+              onmouseover="$(this).find('span').removeClass('glyphicon-upload').addClass('glyphicon-circle-arrow-up');"
+              onmouseout="$(this).find('span').removeClass('glyphicon-circle-arrow-up').addClass('glyphicon-upload');"
+              onclick="$('html,body').animate({scrollTop:0},1000);">
+            <span class="glyphicon glyphicon-upload" style="font-size:40px;color:#999;"></span>
+          </button>
         </div>
       </div>
 
@@ -286,7 +307,10 @@ $(function() {
 
     <footer style="padding-top:40px;padding-bottom:40px;margin-top:40px;color:#777;text-align:center;border-top:1px solid #e5e5e5;">
       <p>Ankoku JS 2014 Brigen team.</p>
-      <p>Released <!-- under the <a href="http://desandro.mit-license.org" target="_blank">MIT License</a> --> by <a href="https://twitter.com/BrightGenerous" target="_blank">ぶらいじぇん@BrightGenerous</a></p>
+      <p>Released
+        <!-- under the <a href="http://desandro.mit-license.org" target="_blank">MIT License</a> -->
+        by <a href="https://twitter.com/BrightGenerous" target="_blank">ぶらいじぇん@BrightGenerous</a>
+      </p>
       <ul>
         <li style="display:inline;">Powered by</li>
         <li style="display:inline;">&middot;</li>
