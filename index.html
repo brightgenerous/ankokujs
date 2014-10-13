@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>AnkokuJS - Brigen Team</title>
+    <title>Niconico Search.</title>
 
     <!-- knockout -->
     <script type="text/javascript" src='./bower_components/knockout/dist/knockout.js'></script>
@@ -31,9 +31,9 @@ function Content(dic) {
   ['length_seconds'].forEach(function(key) {
     var seconds = self['__'+key] = self[key];
     self[key] = [[seconds/60/60,'時間'],[seconds/60%60,'分'],[seconds%60,'秒']]
-          .map(function(set) { return [Math.floor(set[0]),set[1]]; })
-          .filter(function(set) { return set[0] > 0; })
-          .map(function(set) { return set.join(''); }).join('');
+      .map(function(set) { return [Math.floor(set[0]),set[1]]; })
+      .filter(function(set) { return set[0] > 0; })
+      .map(function(set) { return set.join(''); }).join('');
   });
   ['view_counter','mylist_counter','comment_counter'].forEach(function(key) {
     var counter = self['__'+key] = self[key];
@@ -45,11 +45,33 @@ function Content(dic) {
   });
   ['tags'].forEach(function(key) {
     var tags = self['__'+key] = self[key];
-    self[key] = tags.split(' ').map(function(tag) { return tag; });
+    self[key] = tags.split(' ');
   });
+  function wwwUrl(id) { return 'http://www.nicovideo.jp/'+id; }
+  function comUrl(id) { return 'http://com.nicovideo.jp/'+id; }
+  function watchUrl(id) { return wwwUrl('watch/'+id); }
+  function communityUrl(id) { return comUrl('community/'+id); }
   ['cmsid'].forEach(function(key) {
     var id = self['__'+key] = self[key];
-    self[key] = 'http://www.nicovideo.jp/watch/' + id;
+    self[key] = watchUrl(id);
+  });
+  function innerUrl(str) {
+    return str.replace(/((?:mylist|user|watch)[\/\d]+)/g,'<a href="' + wwwUrl('$1') + '" target="_blank">$1</a>')
+      .replace(/(sm[\d]+)/g,'<a href="' + watchUrl('$1') + '" target="_blank">$1</a>')
+      .replace(/(co[\d]+)/g,'<a href="' + communityUrl('$1') + '" target="_blank">$1</a>');
+  }
+  ['description'].forEach(function(key) {
+    var desc = self['__'+key] = self[key];
+    self[key] = desc.split(/(<a(?:>|\s+[^>]*>).*?<\/a>)/).map(function(str,idx) {
+      if (idx % 2 == 1) { return str; }
+      return str.split(/(h?ttps?:\/\/[\w\-_\.:@!~*'\(¥);/?&=\+$,%#]+)/).map(function(str,idx) {
+        console.log(idx);
+        console.log(str);
+        if (idx % 2 == 0) { return innerUrl(str); }
+        var url = str.indexOf('h') == 0 ? str : 'h' + str;
+        return '<a href="' + url + '" target="_blank">' + str + '</a>';
+      }).join('');
+    }).join('');
   });
 }
 
@@ -101,7 +123,6 @@ var ContentsModel = function(layout) {
       function(datas) {
         if (init) { self.contents.removeAll(); }
         datas[2].values.forEach(function(value) {
-          console.log(value);
           self.contents.push(new Content(value));
         });
         if (typeof(layout) == 'function') { layout(); }
@@ -160,6 +181,16 @@ var ContentsModel = function(layout) {
 
   self.more = function() {
     query(param(function(param) { param.from += param.size; }));
+  };
+
+  self.tagOver = ko.observable();
+
+  self.tagIn = function(tag) {
+    self.tagOver(tag);
+  };
+
+  self.tagOut = function(tag) {
+    self.tagOver(null);
   };
 
   (function() {
@@ -228,14 +259,14 @@ $(function() {
                 <span data-bind="text: comment_counter" style="white-space:nowrap;"></span><br />
                 <span class="label label-success" style="display:inline-block;width:65px;">マイリスト</span>
                 <span data-bind="text: mylist_counter" style="white-space:nowrap;"></span><br />
-                <span class="label label-danger" style="display:inline-block;width:65px;">再生時間</span>
+                <span class="label label-default" style="display:inline-block;width:65px;">再生時間</span>
                 <span data-bind="text: length_seconds" style="white-space:nowrap;"></span><br />
-                <span class="label label-default">日時</span>
+                <span class="label label-danger">日時</span>
                 <span data-bind="text: start_time" style="white-space:nowrap;"></span><br />
               </div>
               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <div data-bind="foreach: tags">
-                  <span data-bind="html: toString()" class="label label-info"></span>
+                  <span data-bind="html: toString(), event: { mouseover: $root.tagIn, mouseout: $root.tagOut }, css: { 'label-info': $root.tagOver() != toString(), 'label-primary': $root.tagOver() == toString() }" class="label" style="cursor:default;"></span>
                 </div>
               </div>
             </div>
@@ -249,14 +280,26 @@ $(function() {
 
       <div class="row">
         <div class="col-sm-offset-3 col-md-offset-4 col-lg-offset-4 col-xs-12 col-sm-6 col-md-4 col-lg-4">
-          <button data-bind="click: more, css : { 'btn-primary' : isSortByViewCounter(), 'btn-warning' : isSortByCommentCounter(), 'btn-success' : isSortByMylistCounter(), 'btn-danger' : isSortByStartTime() }" class="btn btn-lg" style="width:100%;">Motto!! щ(ﾟдﾟщ) </button>
+          <button data-bind="click: more, css: { 'btn-primary': isSortByViewCounter(), 'btn-warning': isSortByCommentCounter(), 'btn-success': isSortByMylistCounter(), 'btn-danger': isSortByStartTime() }" class="btn btn-lg" style="width:100%;">Motto!! щ(ﾟдﾟщ) </button>
         </div>
       </div>
 
     </div>
 
     <footer style="padding-top:40px;padding-bottom:40px;margin-top:40px;color:#777;text-align:center;border-top:1px solid #e5e5e5;">
-      <p>Ankoku JS Brigen team 2014.</p>
+      <p>Ankoku JS 2014 Brigen team.</p>
+      <p>Released <!-- under the <a href="http://desandro.mit-license.org" target="_blank">MIT License</a> --> by <a href="https://twitter.com/BrightGenerous" target="_blank">ぶらいじぇん@BrightGenerous</a></p>
+      <ul>
+        <li style="display:inline;">Powered by</li>
+        <li style="display:inline;">&middot;</li>
+        <li style="display:inline;"><a href="http://knockoutjs.com" target="_blank">Knockout</a></li>
+        <li style="display:inline;">&middot;</li>
+        <li style="display:inline;"><a href="http://masonry.desandro.com" target="_blank">Masonry</a></li>
+        <li style="display:inline;">&middot;</li>
+        <li style="display:inline;"><a href="http://www.scala-js.org" target="_blank">Scala.js</a></li>
+        <li style="display:inline;">&middot;</li>
+        <li style="display:inline;"><a href="http://search.nicovideo.jp/docs/api/contest.html" target="_blank">niconico MA 10 API</a></li>
+      </ul>
     </footer>
 
   </body>
