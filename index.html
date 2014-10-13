@@ -47,6 +47,10 @@ function Content(dic) {
     var tags = self['__'+key] = self[key];
     self[key] = tags.split(' ').map(function(tag) { return tag; });
   });
+  ['cmsid'].forEach(function(key) {
+    var id = self['__'+key] = self[key];
+    self[key] = 'http://www.nicovideo.jp/watch/' + id;
+  });
 }
 
 var ContentsModel = function(layout) {
@@ -74,7 +78,7 @@ var ContentsModel = function(layout) {
         //'filters' : [{'type':'equal','field':'music_download','value':true}],
         'from'    : 0,              // editable
         'size'    : 20,             // editable
-        'sort_by' : 'view_counter', // editable
+        'sort_by' : '',             // editable
         'issuer'  : 'apiguide',
         'reason'  : 'ma10'
       };
@@ -97,7 +101,7 @@ var ContentsModel = function(layout) {
       function(datas) {
         if (init) { self.contents.removeAll(); }
         datas[2].values.forEach(function(value) {
-          //console.log(value);
+          console.log(value);
           self.contents.push(new Content(value));
         });
         if (typeof(layout) == 'function') { layout(); }
@@ -126,16 +130,32 @@ var ContentsModel = function(layout) {
     __sortBy('view_counter');
   };
 
+  self.isSortByViewCounter = function() {
+    return self.sortBy() == 'view_counter';
+  };
+
   self.sortByCommentCounter = function() {
     __sortBy('comment_counter');
+  };
+
+  self.isSortByCommentCounter = function() {
+    return self.sortBy() == 'comment_counter';
   };
 
   self.sortByMylistCounter = function() {
     __sortBy('mylist_counter');
   };
 
+  self.isSortByMylistCounter = function() {
+    return self.sortBy() == 'mylist_counter';
+  };
+
   self.sortByStartTime = function() {
     __sortBy('start_time');
+  };
+
+  self.isSortByStartTime = function() {
+    return self.sortBy() == 'start_time';
   };
 
   self.more = function() {
@@ -172,21 +192,21 @@ $(function() {
           <form data-bind="submit: search" class="input-group" style="margin-bottom:10px;">
             <input data-bind="value: word" type="text" class="form-control" />
             <span class="input-group-btn">
-              <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+              <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-search"></span></button>
             </span>
           </form>
           <div class="btn-group btn-group-justified">
             <div class="btn-group">
-              <button data-bind="click: sortByViewCounter, css: { active: sortBy() == 'view_counter' }" type="button" class="btn btn-default">再生数</button>
+              <button data-bind="click: sortByViewCounter, css: { active: isSortByViewCounter() }" type="button" class="btn btn-primary">再生数</button>
             </div>
             <div class="btn-group">
-              <button data-bind="click: sortByCommentCounter, css: { active: sortBy() == 'comment_counter' }" type="button" class="btn btn-default">コメント数</button>
+              <button data-bind="click: sortByCommentCounter, css: { active: isSortByCommentCounter() }" type="button" class="btn btn-warning">コメント数</button>
             </div>
             <div class="btn-group">
-              <button data-bind="click: sortByMylistCounter, css: { active: sortBy() == 'mylist_counter' }" type="button" class="btn btn-default">マイリス数</button>
+              <button data-bind="click: sortByMylistCounter, css: { active: isSortByMylistCounter() }" type="button" class="btn btn-success">マイリス数</button>
             </div>
             <div class="btn-group">
-              <button data-bind="click: sortByStartTime, css: { active: sortBy() == 'start_time' }" type="button" class="btn btn-default">投稿日時</button>
+              <button data-bind="click: sortByStartTime, css: { active: isSortByStartTime() }" type="button" class="btn btn-danger">投稿日時</button>
             </div>
           </div>
         </div>
@@ -197,15 +217,17 @@ $(function() {
           <div class="thumbnail">
             <div class="row">
               <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 text-center">
-                <img data-bind="attr: { src: thumbnail_url }" />
+                <a data-bind="attr: { href: cmsid }" href="#" target="_blank">
+                  <img data-bind="attr: { src: thumbnail_url }" />
+                </a>
               </div>
               <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                 <span class="label label-primary" style="display:inline-block;width:65px;">再生</span>
                 <span data-bind="text: view_counter" style="white-space:nowrap;"></span><br />
-                <span class="label label-success" style="display:inline-block;width:65px;">マイリスト</span>
-                <span data-bind="text: mylist_counter" style="white-space:nowrap;"></span><br />
                 <span class="label label-warning" style="display:inline-block;width:65px;">コメント</span>
                 <span data-bind="text: comment_counter" style="white-space:nowrap;"></span><br />
+                <span class="label label-success" style="display:inline-block;width:65px;">マイリスト</span>
+                <span data-bind="text: mylist_counter" style="white-space:nowrap;"></span><br />
                 <span class="label label-danger" style="display:inline-block;width:65px;">再生時間</span>
                 <span data-bind="text: length_seconds" style="white-space:nowrap;"></span><br />
                 <span class="label label-default">日時</span>
@@ -227,14 +249,14 @@ $(function() {
 
       <div class="row">
         <div class="col-sm-offset-3 col-md-offset-4 col-lg-offset-4 col-xs-12 col-sm-6 col-md-4 col-lg-4">
-          <button data-bind="click: more" class="btn btn-lg btn-primary" style="width:100%;">Motto!! щ(ﾟдﾟщ) </button>
+          <button data-bind="click: more, css : { 'btn-primary' : isSortByViewCounter(), 'btn-warning' : isSortByCommentCounter(), 'btn-success' : isSortByMylistCounter(), 'btn-danger' : isSortByStartTime() }" class="btn btn-lg" style="width:100%;">Motto!! щ(ﾟдﾟщ) </button>
         </div>
       </div>
 
     </div>
 
     <footer style="padding-top:40px;padding-bottom:40px;margin-top:40px;color:#777;text-align:center;border-top:1px solid #e5e5e5;">
-      <p>Ankoku JS Brigen team.</p>
+      <p>Ankoku JS Brigen team 2014.</p>
     </footer>
 
   </body>
