@@ -5,6 +5,7 @@
 
 * JSフレームワーク - [Knockout](http://knockoutjs.com/)
 * AltJS - [Scala.js](http://www.scala-js.org/)
+* 外部API - [niconico Mashup Awards 10 向け提供API](http://search.nicovideo.jp/docs/api/contest.html)
 
 
 ----
