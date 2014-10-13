@@ -50,4 +50,4 @@
 
 #### ブラウザで開く ####
 
-    > open ${WORK_DIR}/index.html
+    > open ${WORK_DIR}/ankokujs/index.html
