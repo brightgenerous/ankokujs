@@ -13,13 +13,13 @@
 
 ### 最初にやっておくこと ###
 
-#### sbt をインストールしておく ####
+#### sbt をインストール ####
 
     > brew install scala
     > brew install sbt
 
 
-#### npm, bower をインストールしておく ####
+#### npm, bower をインストール ####
 
     > brew install node.js
     > npm install bower -g
@@ -36,11 +36,8 @@
 
     > cd ${WORK_DIR}/ankokujs
 
-    > sbt fastOptJS
-
-    > bower install knockout
-    > bower install bootstrap
-    > bower install masonry
+    > npm install
+    > grunt init
 
 
 ----
