@@ -32,7 +32,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'target/scala-2.11',
-            src: '**/*-fastopt.js',
+            src: '**/*-fastopt.js*',
             dest: 'public/scalajs/',
             filter: 'isFile'
           },
@@ -46,7 +46,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'bower_components/jquery/dist/',
-            src: '**/*.min.js',
+            src: '**/*.min.*',
             dest: 'public/jquery/',
             filter: 'isFile'
           },
