@@ -1,0 +1,40 @@
+------------------------------
+// tools
+> brew install scala
+> brew install sbt
+> brew install node.js
+> npm install bower -g
+
+
+------------------------------
+// init
+> mkdir ankokujs
+> cd ankokujs
+
+> npm init
+
+> npm install grunt --save-dev
+    grunt を取ってくる（--save-dev: package.json にも grunt を使うという事を追記する）
+> npm install grunt-bower-task --save-dev
+> npm install grunt-contrib-copy --save-dev
+> npm install grunt-notify --save-dev
+> npm install grunt-exec —save-dev
+
+> bower init  --config.interactive
+> bower install knockout  --save
+    knockout を取ってくる（--save: bower.json にも knockout を使うという事を追記する）
+> bower install bootstrap --save
+> bower install masonry --save
+
+
+------------------------------
+// edit Gruntfile.js
+> vim Gruntfile.js
+
+
+------------------------------
+// install
+
+> npm install
+> grunt init
+

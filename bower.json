@@ -1,0 +1,21 @@
+{
+  "name": "ankokujs",
+  "version": "0.0.0",
+  "homepage": "https://github.com/brightgenerous/ankokujs",
+  "authors": [
+    "brightgenerous <katou.akihiro@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "knockout": "~3.2.0",
+    "bootstrap": "~3.2.0",
+    "masonry": "~3.1.5"
+  }
+}
