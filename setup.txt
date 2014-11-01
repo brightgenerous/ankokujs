@@ -18,7 +18,7 @@
 > npm install grunt-bower-task --save-dev
 > npm install grunt-contrib-copy --save-dev
 > npm install grunt-notify --save-dev
-> npm install grunt-exec —save-dev
+> npm install grunt-exec --save-dev
 
 > bower init  --config.interactive
 > bower install knockout  --save
