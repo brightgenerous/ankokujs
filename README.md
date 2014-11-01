@@ -7,6 +7,7 @@
 * AltJS - [Scala.js](http://www.scala-js.org/)
 * 外部API - [niconico Mashup Awards 10 向け提供API](http://search.nicovideo.jp/docs/api/contest.html)
 
+* デモ - [Ninonico Search.](http://ec2-54-64-77-47.ap-northeast-1.compute.amazonaws.com)
 
 ----
 
