@@ -10,7 +10,7 @@
 
 ----
 
-* デモ - [Ninonico Search.](http://ec2-54-64-77-47.ap-northeast-1.compute.amazonaws.com)
+* デモ - [Ninonico Search.](http://ec2-54-65-40-165.ap-northeast-1.compute.amazonaws.com/)
 
 ----
 
